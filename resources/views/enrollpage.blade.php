@@ -30,97 +30,167 @@
 
 <body>
 
-    <x-navbar/>
+    <x-navbar />
 
     <div id="headerwrap" style="background-color: #EEE; padding-top: 60px;">
         <div class="container">
-            <form method="POST" action="{{ route('submit') }}" enctype="multipart/form-data" class="row">
+            <form class="form" method="POST" action="{{ route('submit') }}" enctype="multipart/form-data"
+                class="row">
                 <div class="col-md-8 offset-md-2">
                     @csrf
 
                     <div class="row shadow p-3 mb-3 bg-body-tertiary">
-                        <legend>Preferred Course</legend>
+                        <legend class="mb-3">Preferred Course</legend>
                         <div class="mb-3 col-md-12">
-                            <select class="form-select" aria-label="Select Preferred Course" name="course" required>
-                                <option value="" selected>Select Course...</option>
-                                @foreach ($course as $item)
-                                    <option value="{{ $item->id }}">{{ $item->course }}</option>
-                                @endforeach
-                            </select>
+                            <div class="input-control">
+                                <select id="categorySelect" name="course" class="input-field"
+                                    placeholder="Select Preferred Course" required>
+                                    <option value="" selected>Select Course...</option>
+                                    @foreach ($course as $item)
+                                        <option value="{{ $item->id }}">{{ $item->course }}</option>
+                                    @endforeach
+                                </select>
+                                <label for="categorySelect" class="input-label">Course</label>
+                            </div>
                         </div>
                     </div>
                     <div class="row shadow p-3 mb-3 bg-body-tertiary">
-                        <legend>Personal Info</legend>
-                        <div class="mb-3 col-md-4">
-                            <label for="inputLname" class="form-label">Last name</label>
-                            <input type="text" class="form-control" id="inputLname" name="last_name" required>
-                        </div>
-                        <div class="mb-3 col-md-4">
-                            <label for="inputFname" class="form-label">First name</label>
-                            <input type="text" class="form-control" id="inputFname" name="first_name" required>
-                        </div>
-                        <div class="mb-3 col-md-4">
-                            <label for="inputMname" class="form-label">Middle name</label>
-                            <input type="text" class="form-control" id="inputMname" name="middle_name" required>
-                        </div>
+                        <legend class="mb-3">Personal Info</legend>
 
+                        <div class="mb-3 col-md-4">
+                            <div class="input-control">
+                                <input id="inputLname" type="text" name="last_name" class="input-field"
+                                    placeholder="Last name" required>
+                                <label for="inputLname" class="input-label">Last name</label>
+                            </div>
+                        </div>
+                        <div class="mb-3 col-md-4">
+                            <div class="input-control">
+                                <input id="inputFname" type="text" name="first_name" class="input-field"
+                                    placeholder="First name" required>
+                                <label for="inputFname" class="input-label">First name</label>
+                            </div>
+                        </div>
+                        <div class="mb-3 col-md-4">
+                            <div class="input-control">
+                                <input id="inputMname" type="text" name="middle_name" class="input-field"
+                                    placeholder="Middle name" required>
+                                <label for="inputMname" class="input-label">Middle name</label>
+                            </div>
+                        </div>
                         <div class="mb-3 col-md-12">
-                            <label for="inputAddress" class="form-label">Address</label>
-                            <input type="text" class="form-control" id="inputAddress" name="address" required>
+                            <div class="input-control">
+                                <input id="inputAddress" type="text" name="address" class="input-field"
+                                    placeholder="Address" required>
+                                <label for="inputAddress" class="input-label">Address</label>
+                            </div>
                         </div>
 
                         <div class="mb-3 col-md-6">
-                            <label for="inputGender" class="form-label">Sex</label>
+
+                            <div class="input-control">
+                                <select id="inputGender" name="gender" class="input-field" placeholder="Select Sex"
+                                    required>
+                                    <option value=''>Select Sex...</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                                <label for="inputGender" class="input-label">Sex</label>
+                            </div>
+
+                            {{-- <label for="inputGender" class="form-label">Sex</label>
                             <select class="form-select" aria-label="Default select example" id="inputGender"
                                 name="gender" required>
                                 <option value=''>Select Sex...</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
-                            </select>
+                            </select> --}}
                         </div>
 
                         <div class="mb-3 col-md-6">
-                            <label for="inputCS" class="form-label">Civil Status</label>
-                            <input type="text" class="form-control" id="inputCS" name="civil_status" required>
+                            <div class="input-control">
+                                <input id="inputCS" type="text" name="civil_status" class="input-field"
+                                    placeholder="Civil Status" required>
+                                <label for="inputCS" class="input-label">Civil Status</label>
+                            </div>
                         </div>
-
                         <div class="mb-3 col-md-6">
-                            <label for="inputNatl" class="form-label">Nationality</label>
-                            <input type="text" class="form-control" id="inputNatl" name="nationality" required>
+                            <div class="input-control">
+                                <input id="inputNatl" type="text" name="nationality" class="input-field"
+                                    placeholder="Nationality" required>
+                                <label for="inputNatl" class="input-label">Nationality</label>
+                            </div>
                         </div>
-
                         <div class="mb-3 col-md-6">
-                            <label for="inputContact" class="form-label">Contact Number</label>
-                            <input type="number" class="form-control" id="inputContact" name="contact_number"
-                                required>
+                            <div class="input-control">
+                                <input id="inputContact" type="number" name="contact_number" class="input-field"
+                                    placeholder="Contact Number" required>
+                                <label for="inputContact" class="input-label">Contact Number</label>
+                            </div>
                         </div>
-
                         <div class="mb-3 col-md-6">
-                            <label for="inputEmail" class="form-label">Email Address</label>
-                            <input type="email" class="form-control" id="inputEmail" name="email" required>
+                            <div class="input-control">
+                                <input id="inputEmail" type="email" name="email" class="input-field"
+                                    placeholder="Email Address" required>
+                                <label for="inputEmail" class="input-label">Email Address</label>
+                            </div>
                         </div>
-
                         <div class="mb-3 col-md-6">
-                            <label for="inputBirthDate" class="form-label">Birth Date</label>
-                            <input type="date" class="form-control" id="inputBirthDate" name="birth_date"
-                                required>
+                            <div class="input-control">
+                                <input id="inputBirthDate" type="date" name="birth_date" class="input-field"
+                                    placeholder="Birth Date" required>
+                                <label for="inputBirthDate" class="input-label">Birth Date</label>
+                            </div>
                         </div>
-
                         <div class="mb-3 col-md-6">
-                            <label for="inputBirthPlace" class="form-label">Birth Place</label>
-                            <input type="text" class="form-control" id="inputBirthPlace" name="birth_place"
-                                required>
+                            <div class="input-control">
+                                <input id="inputBirthPlace" type="text" name="birth_place" class="input-field"
+                                    placeholder="Birth Place" required>
+                                <label for="inputBirthPlace" class="input-label">Birth Place</label>
+                            </div>
                         </div>
                     </div>
                     <div class="row shadow p-3 mb-3 bg-body-tertiary">
-                        <legend>Document Requirements</legend>
+                        <legend class="mb-3">Document Requirements</legend>
                         <div class="mb-3 col-md-6">
-                            <label for="formFile" class="form-label">1 x 1 Picture</label>
-                            <input class="form-control" type="file" id="formFile" name="student_picture"
-                                required>
+                            <div class="input-control">
+                                <input class="input-field" type="file" id="formFileStudentPicture"
+                                    name="student_picture" accept="image/png, image/gif, image/jpeg" required>
+                                <label for="formFileStudentPicture" class="input-label">1 x 1 Picture</label>
+                            </div>
                         </div>
-                        <button class="btn btn-outline-dark w-100" type="submit">Submit</button>
+                        <div class="mb-3 col-md-6">
+                            <div class="input-control">
+                                <input class="input-field" type="file" id="formFileStudentTor" name="student_tor"
+                                    accept="image/png, image/gif, image/jpeg" required>
+                                <label for="formFileStudentTor" class="input-label">Form 137 / Transcript of
+                                    Record</label>
+                            </div>
+                        </div>
+                        <div class="mb-3 col-md-6">
+                            <div class="input-control">
+                                <input class="input-field" type="file" id="formFileStudentHon" name="student_hon"
+                                    accept="image/png, image/gif, image/jpeg" required>
+                                <label for="formFileStudentHon" class="input-label">Form 138 / Hon. Dismissal</label>
+                            </div>
+                        </div>
+                        <div class="mb-3 col-md-6">
+                            <div class="input-control">
+                                <input class="input-field" type="file" id="formFileStudentGmc" name="student_gmc"
+                                    accept="image/png, image/gif, image/jpeg" required>
+                                <label for="formFileStudentGmc" class="input-label">Good Moral Character</label>
+                            </div>
+                        </div>
+                        <div class="mb-3 col-md-6">
+                            <div class="input-control">
+                                <input class="input-field" type="file" id="formFileStudentPsa" name="student_psa"
+                                    accept="image/png, image/gif, image/jpeg" required>
+                                <label for="formFileStudentPsa" class="input-label">PSA Birth Certificate / NSO
+                                    (Photocopy)</label>
+                            </div>
+                        </div>
 
+                        <button class="btn btn-outline-dark w-100" type="submit">Submit</button>
                     </div><!-- /row -->
                 </div>
             </form>

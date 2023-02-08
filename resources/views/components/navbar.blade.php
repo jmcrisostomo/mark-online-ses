@@ -11,7 +11,7 @@
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link active text-primary fw-bold" aria-current="page"
-                        href="{{ url('/enroll') }}">Enroll Now!</a>
+                        href="{{ url('/registration') }}">Enroll Now!</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url('/login') }}">Login</a>

@@ -38,8 +38,9 @@
                 @csrf
                 <!-- Email input -->
                 <div class="form-outline mb-4">
-                    <input type="text" id="username" class="form-control" name="username" value="{{ isset($username) ? $username : '' }}">
-                    <label class="form-label" for="username" >Username</label>
+                    <input type="text" id="username" class="form-control" name="username"
+                        value="{{ isset($username) ? $username : '' }}">
+                    <label class="form-label" for="username">Username</label>
                 </div>
 
                 <!-- Password input -->
@@ -61,10 +62,22 @@
                     @endif
                     @if ($alert == 'INCORRECT')
                         <div class="alert alert-danger" role="alert">
-                            Username or Password are incorrect!
+                            Password or Username not valid!
                         </div>
                     @endif
                 @endisset
+
+                @if (session('message'))
+                    <div class="alert alert-success" role="alert">
+                        {{ session('message') }}
+                    </div>
+                @endif
+
+                @if (session('already_verified'))
+                    <div class="alert alert-danger" role="alert">
+                        {{ session('already_verified') }}
+                    </div>
+                @endif
 
                 <!-- 2 column grid layout for inline styling -->
                 <div class="row mb-4">

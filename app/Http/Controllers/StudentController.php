@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\UserVerificationMail;
 use App\Requirement;
 use App\RequirementType;
 use App\Student;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class StudentController extends Controller
 {
@@ -33,6 +35,10 @@ class StudentController extends Controller
         $birthPlace = $request->input('birth_place');
 
         $studentPicture = $request->file('student_picture');
+        $studentTor = $request->file('student_tor');
+        $studentHon = $request->file('student_hon');
+        $studentGmc = $request->file('student_gmc');
+        $studentPsa = $request->file('student_psa');
 
         $studentId = Student::create([
             'course_id' => $course,
@@ -95,8 +101,10 @@ class StudentController extends Controller
         //     birth_date: "1978-05-28",
         //     birth_place: "Consequuntur rerum d"
         //     }
+        $this->sendRegisterMail($studentId);
 
-        return $request;
+        // return $request;
+        return redirect('/registration/success');
     }
     public function createUserAccount($id, $username)
     {
@@ -148,4 +156,57 @@ class StudentController extends Controller
             'requirement_type_id' => $reqArr[$type][1],
         ]);
     }
+    public function sendRegisterMail($id)
+    {
+        $getUserInfo = DB::table('student')
+            ->select('*')
+            ->join('user', 'user.student_id', '=', 'student.id')
+            ->where('student.id', $id)
+            ->first();
+
+        if ($getUserInfo) {
+
+            $email = $getUserInfo->email;
+            $name = $getUserInfo->name;
+            $username = $getUserInfo->username;
+            $url_verify = url('/registration/verify/' . $getUserInfo->student_code);
+
+            $mailData = [
+                'name'      => $name,
+                'email'     => $email,
+                'username'     => $username,
+                'url_verify'     => $url_verify,
+            ];
+
+            Mail::to($email)->send(new UserVerificationMail($mailData));
+        }
+    }
+
+    public function submitVerify(Request $request)
+    {
+        $password = $request->input('password');
+        $studentCode = $request->input('student_code');
+
+        $studentId = Student::find($studentCode);
+        if ($studentId) {
+            DB::table('user')
+                ->where('student_id', $studentId->id)
+                ->update(['password' => $password, 'status' => 'VERIFIED']);
+
+            return redirect('/login')->with('message', 'Password has been updated, you can now login.');
+        }
+        else {
+            dd('error');
+        }
+    }
+
+    // public function html_email() {
+    //     $data = array('name'=>"Virat Gandhi");
+    //     Mail::send('mail', $data, function($message) {
+    //        $message->to('abc@gmail.com', 'Tutorials Point')->subject
+    //           ('Laravel HTML Testing Mail');
+    //        $message->from('xyz@gmail.com','Virat Gandhi');
+    //     });
+    //     echo "HTML Email Sent. Check your inbox.";
+    //  }
 }

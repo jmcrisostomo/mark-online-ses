@@ -3,12 +3,16 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\UserController;
+use App\Mail\UserVerificationMail;
 use App\Requirement;
 use App\RequirementType;
+use App\Student;
 use Facade\FlareClient\Http\Response;
 use Facade\FlareClient\Stacktrace\File;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -28,24 +32,41 @@ use Illuminate\Support\Facades\Storage;
 // });
 
 Route::get('/', [HomeController::class, 'index']);
-Route::get('/enroll', [HomeController::class, 'enroll']);
 Route::get('/login', [HomeController::class, 'login']);
+Route::post('/login/user', [LoginController::class, 'loginUser'])->name('login-user');
+
+Route::get('/registration', [HomeController::class, 'enroll']);
+Route::post('/registration/submit', [StudentController::class, 'submit'])->name('submit');
+Route::get('/registration/success', [HomeController::class, 'submitSuccess']);
+Route::get('/registration/verify/{student_code}', [HomeController::class, 'registrationVerify']);
+Route::post('/registration/verify/submit', [StudentController::class, 'submitVerify'])->name('submit_verify');
+
+// Dashboard
+Route::get('/dashboard', [UserController::class, 'dashboard']);
 
 
-Route::post('/submit', [StudentController::class, 'submit'])->name('submit');
-
-Route::post('login/user', [LoginController::class, 'loginUser'])->name('login-user');
 
 
-Route::get('/dashboard', [HomeController::class, 'dashboard']);
 
+
+
+
+
+
+
+
+
+
+
+
+// TESTING PURPOSES
 
 Route::get('/test', [StudentController::class, 'createUserAccount']);
 Route::get('/testEloquent', function () {
-    $req = DB::table('requirement')
-        ->select('*')
-        ->join('requirement_type', 'requirement_type.id', '=', "requirement.requirement_type_id")
-        ->get();
+    // $req = DB::table('requirement')
+    //     ->select('*')
+    //     ->join('requirement_type', 'requirement_type.id', '=', "requirement.requirement_type_id")
+    //     ->get();
 
 
     // $inputs = collect([
@@ -67,7 +88,40 @@ Route::get('/testEloquent', function () {
     //     echo $value;
     // }
 
-    return response()->json($req);
+    $studentId = Student::find('00000017');
+
+    $getUserInfo = DB::table('student')
+        ->select('*')
+        ->join('user', 'user.student_id', '=', 'student.id')
+        ->where('student.id', 17)
+        ->first();
+
+    // if ($getUserInfo) {
+
+    //     $email = $getUserInfo->email;
+    //     $email = 'crisjohnmatthew13@gmail.com';
+    //     $name = $getUserInfo->name;
+
+    //     Mail::to($email)->send('hello');
+
+    //     Mail::send('smtp', ['data'], function ($message) {
+    //         $message->to('crisjohnmatthew13@gmail.com', 'Mattheus')->subject('USER ACCOUNT - ONLINE STUDENT ENROLLMENT SYSTEM');
+    //         $message->from('jm.crisostomo.e@gmail.com', 'JM Crisostomo');
+    //     });
+    // }
+
+    return response()->json($studentId);
+});
+
+Route::get('test/mail', function () {
+    $mailData = [
+        'title' => 'Mail from ItSolutionStuff.com',
+        'body' => 'This is for testing email using smtp.'
+    ];
+
+    Mail::to('crisjohnmatthew13@gmail.com')->send(new UserVerificationMail($mailData));
+
+    dd("Email is sent successfully.");
 });
 
 Route::get('/testImagestorage', function () {

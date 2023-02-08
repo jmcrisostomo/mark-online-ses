@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Course;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -17,15 +18,6 @@ class HomeController extends Controller
         return view('login');
     }
 
-    public function dashboard()
-    {
-        if (session()->has('login_time')) {
-            return view('user.dashboard');
-        } else {
-            return redirect('/login');
-        }
-    }
-
     public function enroll()
     {
 
@@ -34,5 +26,25 @@ class HomeController extends Controller
         return view('enrollpage', [
             'course' => $course
         ]);
+    }
+
+    public function submitSuccess()
+    {
+        return view('success_enrollpage');
+    }
+
+    public function registrationVerify($studentCode)
+    {
+        $verifyStudentCode = DB::table('student as s')
+            ->select('s.id', 'u.status', 'u.username', 'u.name', 's.student_code')
+            ->join('user as u', 'u.student_id', '=', 's.id')
+            ->where('s.student_code', $studentCode)
+            ->first();
+        if ($verifyStudentCode->status == 'UNVERIFIED') {
+            return view('userverify', ['studentCode' => $verifyStudentCode->student_code]);
+        } else {
+            // dd('User is already verified');
+            return redirect('/login')->with('already_verified', 'Student Code is already verified.');
+        }
     }
 }
