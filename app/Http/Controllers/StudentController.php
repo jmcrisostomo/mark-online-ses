@@ -10,6 +10,7 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Yajra\DataTables\DataTables;
 
 class StudentController extends Controller
 {
@@ -194,11 +195,26 @@ class StudentController extends Controller
                 ->update(['password' => $password, 'status' => 'VERIFIED']);
 
             return redirect('/login')->with('message', 'Password has been updated, you can now login.');
-        }
-        else {
+        } else {
             dd('error');
         }
     }
+
+    public function getStudents(Request $request)
+    {
+        if ($request->ajax()) {
+            $data = Student::orderByDesc('id')->get();
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('action', function ($row) {
+                    $actionBtn = '<a href="javascript:void(0)" class="edit btn btn-success btn-sm">Edit</a> <a href="javascript:void(0)" class="delete btn btn-danger btn-sm">Delete</a>';
+                    return $actionBtn;
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+    }
+
 
     // public function html_email() {
     //     $data = array('name'=>"Virat Gandhi");

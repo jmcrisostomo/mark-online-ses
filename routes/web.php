@@ -4,6 +4,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\Session;
 use App\Mail\UserVerificationMail;
 use App\Requirement;
 use App\RequirementType;
@@ -31,8 +32,8 @@ use Illuminate\Support\Facades\Storage;
 //     return view('welcome');
 // });
 
-Route::get('/', [HomeController::class, 'index']);
-Route::get('/login', [HomeController::class, 'login']);
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/login', [HomeController::class, 'login'])->name('login');
 Route::post('/login/user', [LoginController::class, 'loginUser'])->name('login-user');
 
 Route::get('/registration', [HomeController::class, 'enroll']);
@@ -41,8 +42,13 @@ Route::get('/registration/success', [HomeController::class, 'submitSuccess']);
 Route::get('/registration/verify/{student_code}', [HomeController::class, 'registrationVerify']);
 Route::post('/registration/verify/submit', [StudentController::class, 'submitVerify'])->name('submit_verify');
 
+// Students
+Route::get('/data/student', [StudentController::class, 'getStudents'])->name('students.list');
+
+
 // Dashboard
-Route::get('/dashboard', [UserController::class, 'dashboard']);
+Route::get('/dashboard', [UserController::class, 'dashboard'])
+    ->middleware(Session::class);
 
 
 

@@ -73,6 +73,12 @@
                     </div>
                 @endif
 
+                @if (session('not_logged_in'))
+                    <div class="alert alert-danger" role="alert">
+                        {{ session('not_logged_in') }}
+                    </div>
+                @endif
+
                 @if (session('already_verified'))
                     <div class="alert alert-danger" role="alert">
                         {{ session('already_verified') }}

@@ -15,7 +15,9 @@
         "laravel/framework": "^7.29",
         "laravel/tinker": "^2.5",
         "symfony/http-client": "^5.4",
-        "symfony/mailgun-mailer": "^5.4"
+        "symfony/mailgun-mailer": "^5.4",
+        "yajra/laravel-datatables": "^1.5",
+        "yajra/laravel-datatables-oracle": "~9.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.7",
