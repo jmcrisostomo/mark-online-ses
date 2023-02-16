@@ -34,8 +34,7 @@
 
     <div id="headerwrap" style="background-color: #EEE; padding-top: 60px;">
         <div class="container">
-            <form class="form" method="POST" action="{{ route('submit') }}" enctype="multipart/form-data"
-                class="row">
+            <form class="form row" method="POST" action="{{ route('submit') }}" enctype="multipart/form-data">
                 <div class="col-md-8 offset-md-2">
                     @csrf
 

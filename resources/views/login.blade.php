@@ -26,106 +26,136 @@
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
+    <style>
+        .login-bg {
+            background-image: url(http://127.0.0.1:8000/assets/img/login-bg.png);
+            background-position: 60% top;
+            clip-path: polygon(0 0%, 100% 0, 70% 100%, 0 100%);
+            height: 80vh;
+            background-color: gray;
+            background-blend-mode: multiply;
+            box-shadow: 5px 5px 10px rgb(0 0 0 / 50%);
+            /* width: 100vw; */
+        }
+    </style>
 </head>
 
 <body>
 
     <x-navbar />
 
-    <div class="row mt-5">
-        <div class="col-md-6 offset-md-3">
-            <form method="POST" action="{{ route('login-user') }}">
-                @csrf
-                <!-- Email input -->
-                <div class="form-outline mb-4">
-                    <input type="text" id="username" class="form-control" name="username"
-                        value="{{ isset($username) ? $username : '' }}">
-                    <label class="form-label" for="username">Username</label>
-                </div>
 
-                <!-- Password input -->
-                <div class="form-outline mb-4">
-                    <input type="password" id="password" class="form-control" name="password">
-                    <label class="form-label" for="password">Password</label>
-                </div>
 
-                @isset($alert)
-                    @if ($alert == 'EMPTY_FIELD')
-                        <div class="alert alert-warning" role="alert">
-                            Username and Password cannot be empty!
+
+    <div class="row bg-light">
+        <div class="login-bg col-lg-8 d-lg-block d-none"></div>
+
+        <div class="col-lg-4">
+
+            <div class="d-flex align-items-center justify-content-center" style="height: 80vh;">
+                <form method="POST" action="{{ route('login-user') }}" class="form w-100 me-lg-5 me-0">
+                    @csrf
+
+                    <legend class="mb-3 h1 text-center">Login</legend>
+
+                    {{-- Username Input --}}
+                    <div class="mb-3">
+                        <div class="form-outline input-control">
+                            <input id="username" type="text" name="username" class="input-field"
+                                placeholder="Username" value="{{ isset($username) ? $username : '' }}">
+                            <label for="username" class="input-label">Username</label>
+                        </div>
+                    </div>
+
+                    {{-- Password Input --}}
+
+                    <div class="mb-3">
+                        <div class="form-outline input-control">
+                            <input id="password" type="password" name="password" class="input-field"
+                                placeholder="Password">
+                            <label for="password" class="input-label">Password</label>
+                        </div>
+                    </div>
+
+                    @isset($alert)
+                        @if ($alert == 'EMPTY_FIELD')
+                            <div class="alert alert-warning" role="alert">
+                                Username and Password cannot be empty!
+                            </div>
+                        @endif
+                        @if ($alert == 'EMPTY_PASS')
+                            <div class="alert alert-warning" role="alert">
+                                Password cannot be empty!
+                            </div>
+                        @endif
+                        @if ($alert == 'INCORRECT')
+                            <div class="alert alert-danger" role="alert">
+                                Password or Username not valid!
+                            </div>
+                        @endif
+                    @endisset
+
+                    @if (session('message'))
+                        <div class="alert alert-success" role="alert">
+                            {{ session('message') }}
                         </div>
                     @endif
-                    @if ($alert == 'EMPTY_PASS')
-                        <div class="alert alert-warning" role="alert">
-                            Password cannot be empty!
-                        </div>
-                    @endif
-                    @if ($alert == 'INCORRECT')
+
+                    @if (session('not_logged_in'))
                         <div class="alert alert-danger" role="alert">
-                            Password or Username not valid!
+                            {{ session('not_logged_in') }}
                         </div>
                     @endif
-                @endisset
 
-                @if (session('message'))
-                    <div class="alert alert-success" role="alert">
-                        {{ session('message') }}
-                    </div>
-                @endif
-
-                @if (session('not_logged_in'))
-                    <div class="alert alert-danger" role="alert">
-                        {{ session('not_logged_in') }}
-                    </div>
-                @endif
-
-                @if (session('already_verified'))
-                    <div class="alert alert-danger" role="alert">
-                        {{ session('already_verified') }}
-                    </div>
-                @endif
-
-                <!-- 2 column grid layout for inline styling -->
-                <div class="row mb-4">
-                    {{-- <div class="col d-flex justify-content-center">
-                        <!-- Checkbox -->
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="form2Example31"
-                                checked />
-                            <label class="form-check-label" for="form2Example31"> Remember me </label>
+                    @if (session('already_verified'))
+                        <div class="alert alert-danger" role="alert">
+                            {{ session('already_verified') }}
                         </div>
+                    @endif
+
+                    <!-- 2 column grid layout for inline styling -->
+                    <div class="row mb-4">
+                        {{-- <div class="col d-flex justify-content-center">
+                            <!-- Checkbox -->
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="form2Example31"
+                                    checked />
+                                <label class="form-check-label" for="form2Example31"> Remember me </label>
+                            </div>
+                        </div> --}}
+
+                        {{-- <div class="col">
+                            <!-- Simple link -->
+                            <a href="#!">Forgot password?</a>
+                        </div> --}}
+                    </div>
+
+                    <!-- Submit button -->
+                    <button type="submit" class="btn btn-primary btn-block mb-4 btn-lg w-100">Log in</button>
+                    <a href="{{ url('/registration') }}" class="btn btn-primary btn-block mb-4 btn-lg w-100">Register</a>
+
+                    <!-- Register buttons -->
+                    {{-- <div class="text-center">
+                        <p>Not a member? <a href="#!">Register</a></p>
+                        <p>or sign up with:</p>
+                        <button type="button" class="btn btn-link btn-floating mx-1">
+                            <i class="fab fa-facebook-f"></i>
+                        </button>
+
+                        <button type="button" class="btn btn-link btn-floating mx-1">
+                            <i class="fab fa-google"></i>
+                        </button>
+
+                        <button type="button" class="btn btn-link btn-floating mx-1">
+                            <i class="fab fa-twitter"></i>
+                        </button>
+
+                        <button type="button" class="btn btn-link btn-floating mx-1">
+                            <i class="fab fa-github"></i>
+                        </button>
                     </div> --}}
-
-                    {{-- <div class="col">
-                        <!-- Simple link -->
-                        <a href="#!">Forgot password?</a>
-                    </div> --}}
-                </div>
-
-                <!-- Submit button -->
-                <button type="submit" class="btn btn-primary btn-block mb-4">Log in</button>
-
-                <!-- Register buttons -->
-                {{-- <div class="text-center">
-                    <p>Not a member? <a href="#!">Register</a></p>
-                    <p>or sign up with:</p>
-                    <button type="button" class="btn btn-link btn-floating mx-1">
-                        <i class="fab fa-facebook-f"></i>
-                    </button>
-
-                    <button type="button" class="btn btn-link btn-floating mx-1">
-                        <i class="fab fa-google"></i>
-                    </button>
-
-                    <button type="button" class="btn btn-link btn-floating mx-1">
-                        <i class="fab fa-twitter"></i>
-                    </button>
-
-                    <button type="button" class="btn btn-link btn-floating mx-1">
-                        <i class="fab fa-github"></i>
-                    </button>
-                </div> --}}
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 
