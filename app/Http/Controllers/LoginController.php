@@ -46,7 +46,13 @@ class LoginController extends Controller
             session($sessionArr);
 
             // return response()->json($request->session()->all());
-            return redirect('/dashboard');
+
+
+            if ($user->user_type == 'REGISTRAR') {
+                return redirect('/students');
+            } else {
+                return redirect('/dashboard');
+            }
         } else {
             return view('login', ['username' => $username, 'alert' => 'INCORRECT']);
         }

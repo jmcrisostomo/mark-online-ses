@@ -17,7 +17,6 @@ class Session
     {
 
         if (session()->has('login_time')) {
-            // var_dump(session()->all());
 
         } else {
             redirect()->route('login')->with('not_logged_in', 'You are not logged in.');

@@ -44,11 +44,37 @@ Route::post('/registration/verify/submit', [StudentController::class, 'submitVer
 
 // Students
 Route::get('/data/student', [StudentController::class, 'getStudents'])->name('students.list');
+Route::get('/data/student/requirement/{student_id}', function ($studentId) {
+    $getRequirements = DB::table('requirement')
+        ->select('*')
+        ->join('requirement_type', 'requirement_type.id', '=', 'requirement.requirement_type_id')
+        ->where('student_id', $studentId)
+        ->get();
+
+    $getRequirements = collect($getRequirements)->map(function ($arr) {
+        return $arr = [
+            'requirement_type' => $arr->requirement_type,
+            'file' => asset($arr->requirement_path . $arr->requirement_filename . '?t=' . time()),
+            'created_at' => $arr->created_at,
+            'updated_at' => $arr->updated_at,
+            'modified_by' => $arr->modified_by,
+        ];
+    });
 
 
-// Dashboard
+    return response()->json($getRequirements);
+})->name('student-table')->middleware(Session::class);
+
+
+// Student
 Route::get('/dashboard', [UserController::class, 'dashboard'])
     ->middleware(Session::class);
+
+
+// Registrar Routes
+Route::get('/students', function () {
+    return view('user.registrar.student-table');
+})->name('student-table')->middleware(Session::class);
 
 
 
