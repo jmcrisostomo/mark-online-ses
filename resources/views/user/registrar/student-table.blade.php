@@ -3,15 +3,22 @@
 @section('studentTable')
     <div class="container mt-5">
         <h2 class="mb-4">Students</h2>
+
+        @if (session('message'))
+            <div class="alert alert-primary" role="alert">
+                {{ session('message') }}
+            </div>
+        @endif
+
         <table class="table table-bordered student-datatable">
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Student Code</th>
                     <th>Status</th>
-                    <th>Name</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
                     <th>Email</th>
-                    <th>Username</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -41,40 +48,63 @@
 
     <!-- approveModal -->
     <div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="approveModalLabel">Approve</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    {{-- Generate Data Here --}}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success">Approve</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <form class="form" method="POST" action="{{ route('approve-student') }}" enctype="multipart/form-data">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="approveModalLabel">Approve Student</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        @csrf
+
+                        <input type="hidden" id="approveStudentId" name="student_id">
+                        <p class="mb-3">Name: <span class="student-name fw-bold"></span></p>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Approve</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 
     <!-- declineModal -->
     <div class="modal fade" id="declineModal" tabindex="-1" aria-labelledby="declineModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="declineModalLabel">Decline</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    {{-- Generate Data Here --}}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger">Decline</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <form class="form" method="POST" action="{{ route('decline-student') }}" enctype="multipart/form-data">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="declineModalLabel">Decline Student</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        {{-- <legend>Reason for Decline</legend> --}}
+                        <div class="row bg-body-tertiary">
+                            @csrf
+
+                            <p class="mb-3">Name: <span class="student-name fw-bold"></span></p>
+
+                            <input type="hidden" id="declineStudentId" name="student_id">
+
+                            <div class="mb-3 col-md-12">
+                                <div class="input-control">
+                                    <textarea id="inputLname" name="decline_reason" class="input-field" placeholder="Reason" style="resize: none;" required></textarea>
+                                    <label for="inputLname" class="input-label">Reason for Decline</label>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger">Decline</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 @endsection
 
@@ -130,7 +160,7 @@
                         name: 'student_code'
                     },
                     {
-                        data: 'status',
+                        data: 'status_badge',
                         name: 'status'
                     },
                     {
@@ -169,14 +199,33 @@
             });
 
             $('.student-datatable').on('click', '.approve', function() {
+
+                let dataStudentId = $(this).attr('data-student-id');
+                let dataStudentName = $(this).attr('data-student-name');
+
                 setTimeout(() => {
+                    document.querySelector('#approveModal .student-name').innerHTML =
+                        dataStudentName
+
+                    document.querySelector('#approveModal #approveStudentId').value =
+                        dataStudentId
+
                     approveModal.show()
                 }, 100);
 
             });
 
             $('.student-datatable').on('click', '.decline', function() {
+                let dataStudentId = $(this).attr('data-student-id');
+                let dataStudentName = $(this).attr('data-student-name');
+
                 setTimeout(() => {
+                    document.querySelector('#declineModal .student-name').innerHTML =
+                        dataStudentName
+
+                    document.querySelector('#declineModal #declineStudentId').value =
+                        dataStudentId
+
                     declineModal.show()
                 }, 100);
 

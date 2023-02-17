@@ -48,6 +48,7 @@ Route::get('/data/student/requirement/{student_id}', function ($studentId) {
     $getRequirements = DB::table('requirement')
         ->select('*')
         ->join('requirement_type', 'requirement_type.id', '=', 'requirement.requirement_type_id')
+        ->join('student', 'student.id', '=', 'requirement.student_id')
         ->where('student_id', $studentId)
         ->get();
 
@@ -76,6 +77,8 @@ Route::get('/students', function () {
     return view('user.registrar.student-table');
 })->name('student-table')->middleware(Session::class);
 
+Route::post('/students/submit/approve', [StudentController::class, 'approveStudent'])->name('approve-student')->middleware(Session::class);
+Route::post('/students/submit/decline', [StudentController::class, 'declineStudent'])->name('decline-student')->middleware(Session::class);
 
 
 

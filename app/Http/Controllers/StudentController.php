@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\StudentApproveMail;
+use App\Mail\StudentDeclineMail;
 use App\Mail\UserVerificationMail;
 use App\Requirement;
 use App\RequirementType;
@@ -206,18 +208,96 @@ class StudentController extends Controller
             $data = Student::orderByDesc('id')->get();
             return DataTables::of($data)
                 ->addIndexColumn()
+                ->addColumn('status_badge', function ($row) {
+
+                    if ($row->status == 'PENDING') {
+                        $badge = '<span class="badge bg-warning text-dark">' . $row->status . '</span>';
+                    } else if ($row->status == 'APPROVED') {
+                        $badge = '<span class="badge bg-success">' . $row->status . '</span>';
+                    } else if ($row->status == 'DECLINED') {
+                        $badge = '<span class="badge bg-danger">' . $row->status . '</span>';
+                    } else {
+                        $badge = '<span class="badge bg-light">' . $row->status . '</span>';
+                    }
+
+                    return $badge;
+                })
                 ->addColumn('action', function ($row) {
-                    $actionBtn = '
-                    <a class="docs btn btn-primary btn-sm" data-student-id="'.$row->id.'">View Documents</a>
-                    <a class="approve btn btn-success btn-sm" data-student-id="'.$row->id.'">Approve</a>
-                    <a class="decline btn btn-danger btn-sm" data-student-id="'.$row->id.'">Decline</a>';
+
+                    $name = implode(" ", [$row->first_name, $row->last_name]);
+
+                    if ($row->status == 'PENDING') {
+                        $actionBtn = '
+                        <a class="docs btn btn-primary btn-sm" data-student-id="' . $row->id . '">View Documents</a>
+                        <a class="approve btn btn-success btn-sm" data-student-id="' . $row->id . '" data-student-name="' . $name . '">Approve</a>
+                        <a class="decline btn btn-danger btn-sm" data-student-id="' . $row->id . '" data-student-name="' . $name . '">Decline</a>';
+                    } else {
+                        $actionBtn = '
+                        <a class="docs btn btn-primary btn-sm" data-student-id="' . $row->id . '">View Documents</a>';
+                    }
+
+
                     return $actionBtn;
                 })
-                ->rawColumns(['action'])
+                ->rawColumns(['action', 'status_badge'])
                 ->make(true);
         }
     }
 
+
+    public function approveStudent(Request $request)
+    {
+        $studentId = $request->input('student_id');
+        $studentId = Student::find($studentId);
+
+        if ($studentId) {
+            DB::table('student')
+                ->where('id', $studentId->id)
+                ->update(['status' => 'APPROVED', 'student_requirement_status' => 'COMPLETED']);
+
+            $name = implode(' ', [$studentId->first_name, $studentId->last_name]);
+            $email = $studentId->email;
+
+            $mailData = [
+                'name'      => $name,
+                'email'     => $email,
+            ];
+
+            Mail::to($email)->send(new StudentApproveMail($mailData));
+
+            return redirect('/students')->with('message', 'Student Approved.');
+        } else {
+            return redirect('/students')->with('message', 'Cannot find Student.');
+        }
+    }
+
+    public function declineStudent(Request $request)
+    {
+        $studentId = $request->input('student_id');
+        $declineReason = $request->input('decline_reason');
+        $studentId = Student::find($studentId);
+
+        if ($studentId) {
+            DB::table('student')
+                ->where('id', $studentId->id)
+                ->update(['status' => 'DECLINED', 'decline_reason' => $declineReason]);
+
+            $name = implode(' ', [$studentId->first_name, $studentId->last_name]);
+            $email = $studentId->email;
+
+            $mailData = [
+                'name'      => $name,
+                'email'     => $email,
+                'reason'    => $declineReason
+            ];
+
+            Mail::to($email)->send(new StudentDeclineMail($mailData));
+
+            return redirect('/students')->with('message', 'Student Declined.');
+        } else {
+            return redirect('/students')->with('message', 'Cannot find Student.');
+        }
+    }
 
     // public function html_email() {
     //     $data = array('name'=>"Virat Gandhi");
