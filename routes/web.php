@@ -34,6 +34,10 @@ use Illuminate\Support\Facades\Storage;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/login', [HomeController::class, 'login'])->name('login');
+Route::get('/logout', function () {
+    session()->flush();
+    return redirect('/login')->with('logged_out', 'You have been logged out.');
+})->name('logout');
 Route::post('/login/user', [LoginController::class, 'loginUser'])->name('login-user');
 
 Route::get('/registration', [HomeController::class, 'enroll']);

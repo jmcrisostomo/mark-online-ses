@@ -17,6 +17,8 @@
 
     <!-- Custom styles for this template -->
     <link href="{{ asset('assets/css/main.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/form-input.css') }}" rel="stylesheet">
+
 
     <!-- Fonts from Google Fonts -->
     <link href='http://fonts.googleapis.com/css?family=Lato:300,400,900' rel='stylesheet' type='text/css'>
@@ -125,6 +127,12 @@
                     @if (session('already_verified'))
                         <div class="alert alert-danger" role="alert">
                             {{ session('already_verified') }}
+                        </div>
+                    @endif
+
+                    @if (session('logged_out'))
+                        <div class="alert alert-primary" role="alert">
+                            {{ session('logged_out') }}
                         </div>
                     @endif
 
