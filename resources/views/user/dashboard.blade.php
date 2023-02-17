@@ -32,9 +32,17 @@
 
         <div id="layoutSidenav_content">
 
-            <main>
-                @yield('studentTable')
-            </main>
+            @if (session('user_type') == 'REGISTRAR')
+                <main>
+                    @yield('studentTable')
+                </main>
+            @endif
+
+            @if (session('user_type') == 'STUDENT')
+                <main>
+                    @yield('studentInfo')
+                </main>
+            @endif
 
             <footer class="py-4 bg-light mt-auto">
                 <div class="container-fluid px-4">
@@ -64,8 +72,10 @@
     <script type="text/javascript"
         src="https://cdn.datatables.net/v/bs5/jq-3.6.0/jszip-2.5.0/dt-1.13.2/b-2.3.4/b-html5-2.3.4/r-2.4.0/datatables.min.js">
     </script>
-    @yield('studentTableScript')
 
+    @if (session('user_type') == 'REGISTRAR')
+        @yield('studentTableScript')
+    @endif
 </body>
 
 </html>

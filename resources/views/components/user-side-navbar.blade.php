@@ -12,6 +12,14 @@
                 @else
                 @endif
 
+                @if (session('user_type') == 'STUDENT')
+                    <a class="nav-link" href="{{ route('student-table') }}">
+                        <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
+                        Student Info
+                    </a>
+                @else
+                @endif
+
                 {{-- <div class="sb-sidenav-menu-heading">Interface</div>
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
                     data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">

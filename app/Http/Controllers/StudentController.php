@@ -122,7 +122,7 @@ class StudentController extends Controller
                 'username'      => $username,
                 'password'      => "test1234",
                 'name'          => $student->first_name . " " . $student->last_name,
-                'status'        => "VERIFIED",
+                'status'        => "UNVERIFIED",
                 'type'          => 5 // user type
             ]);
         } else {

@@ -50,6 +50,8 @@ class LoginController extends Controller
 
             if ($user->user_type == 'REGISTRAR') {
                 return redirect('/students');
+            } elseif ($user->user_type == 'STUDENT') {
+                return redirect('/info');
             } else {
                 return redirect('/dashboard');
             }

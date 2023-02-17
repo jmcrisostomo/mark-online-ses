@@ -75,6 +75,24 @@ Route::get('/data/student/requirement/{student_id}', function ($studentId) {
 Route::get('/dashboard', [UserController::class, 'dashboard'])
     ->middleware(Session::class);
 
+Route::get('/info', function () {
+
+    $id = session('student_id');
+
+    // $userInfo = DB::table('student')
+    //     ->where('id', $id)
+    //     ->get();
+
+    $userInfo = Student::find($id);
+
+    $name = implode(' ', [
+        $userInfo->first_name,
+        $userInfo->middle_name,
+        $userInfo->last_name,
+    ]);
+
+    return view('user.student.info', ['studentInfo' => $userInfo, 'name' => $name]);
+})->name('student-info')->middleware(Session::class);
 
 // Registrar Routes
 Route::get('/students', function () {
