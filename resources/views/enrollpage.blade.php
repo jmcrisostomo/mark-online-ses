@@ -34,6 +34,9 @@
 
     <div id="headerwrap" style="background-color: #EEE; padding-top: 60px;">
         <div class="container">
+
+            <h1 class="text-dark text-center">Registration</h1>
+
             <form class="form row" method="POST" action="{{ route('submit') }}" enctype="multipart/form-data">
                 <div class="col-md-8 offset-md-2">
                     @csrf

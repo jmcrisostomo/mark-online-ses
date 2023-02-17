@@ -23,6 +23,10 @@
         0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
+html, body {
+    overflow-x: hidden;
+}
+
 body {
     background-color: var(--body-bg);
     font-family: 'Lato', sans-serif;
@@ -30,7 +34,6 @@ body {
     font-size: 16px;
     color: #555;
     width: 100%;
-    overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -webkit-overflow-scrolling: touch;
 }

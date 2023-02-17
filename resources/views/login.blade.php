@@ -28,32 +28,47 @@
     <![endif]-->
     <style>
         .login-bg {
-            background-image: url(http://127.0.0.1:8000/assets/img/login-bg.png);
-            background-position: 60% top;
-            clip-path: polygon(0 0%, 100% 0, 70% 100%, 0 100%);
-            height: 80vh;
+            background-image: url('{{ asset('assets/img/login-bg.png') }}');
+            background-position: 50% top;
+            clip-path: polygon(0 0%, 100% 0, 75% 100%, 0 100%);
+            height: 100vh;
             background-color: gray;
             background-blend-mode: multiply;
             box-shadow: 5px 5px 10px rgb(0 0 0 / 50%);
-            /* width: 100vw; */
+            position: relative;
+        }
+
+        .heading {
+            position: absolute;
+            top: 50%;
+            left: 45%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+        }
+
+        .heading h1 {
+            font-size: 8vh;
+            text-align: center;
         }
     </style>
 </head>
 
 <body>
 
-    <x-navbar />
-
-
-
+    {{-- <x-navbar /> --}}
 
     <div class="row bg-light">
-        <div class="login-bg col-lg-8 d-lg-block d-none"></div>
+        <div class="login-bg col-lg-8 d-lg-block d-none">
+            <div class="heading">
+                <h1 class="text-light">Welcome!<br>To Our<br>Online<br>Enrollment System</h1>
+            </div>
+        </div>
 
         <div class="col-lg-4">
 
-            <div class="d-flex align-items-center justify-content-center" style="height: 80vh;">
-                <form method="POST" action="{{ route('login-user') }}" class="form w-100 me-lg-5 me-0">
+            <div class="d-flex align-items-center justify-content-center" style="height: 100vh;">
+                <form method="POST" action="{{ route('login-user') }}" class="form w-100 me-lg-5 me-0"
+                    style="max-width: 350px;">
                     @csrf
 
                     <legend class="mb-3 h1 text-center">Login</legend>
@@ -132,7 +147,8 @@
 
                     <!-- Submit button -->
                     <button type="submit" class="btn btn-primary btn-block mb-4 btn-lg w-100">Log in</button>
-                    <a href="{{ url('/registration') }}" class="btn btn-primary btn-block mb-4 btn-lg w-100">Register</a>
+                    <a href="{{ url('/registration') }}"
+                        class="btn btn-primary btn-block mb-4 btn-lg w-100">Register</a>
 
                     <!-- Register buttons -->
                     {{-- <div class="text-center">
@@ -159,10 +175,10 @@
         </div>
     </div>
 
-    <div class="container">
+    {{-- <div class="container">
         <hr>
-        <div class="row centered">
-            {{-- <div class="col-lg-6 col-lg-offset-3">
+        <div class="row centered"> --}}
+    {{-- <div class="col-lg-6 col-lg-offset-3">
             <form class="form-inline" role="form">
                 <div class="form-group">
                     <input type="email" class="form-control" id="exampleInputEmail1"
@@ -171,11 +187,11 @@
                 <button type="submit" class="btn btn-warning btn-lg">Invite Me!</button>
             </form>
         </div> --}}
-            {{-- <div class="col-lg-3"></div> --}}
-        </div><!-- /row -->
+    {{-- <div class="col-lg-3"></div> --}}
+    {{-- </div><!-- /row -->
         <hr>
         <p class="centered">Built with ♥ - 2022</p>
-    </div><!-- /container -->
+    </div><!-- /container --> --}}
 
 
     <!-- Bootstrap core JavaScript

@@ -37,7 +37,7 @@
             <div class="row">
                 <div class="col-lg-6">
                     <h1>Enrollment has never been easier.</h1>
-                    <a href="{{ url('/registration') }}" class="btn btn-warning btn-lg">Enroll Now!</a>
+                    <a href="{{ url('/registration') }}" class="btn btn-warning btn-lg">Register Now!</a>
                 </div><!-- /col-lg-6 -->
                 <div class="col-lg-6">
                     <div class="text-center">
