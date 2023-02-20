@@ -205,7 +205,11 @@ class StudentController extends Controller
     public function getStudents(Request $request)
     {
         if ($request->ajax()) {
-            $data = Student::orderByDesc('id')->get();
+            $data = DB::table('student')
+                ->select('student.*', 'course.course', 'course.course_fee')
+                ->join('course', 'course.id', '=', 'student.course_id')
+                ->orderBy('student.id', 'desc')
+                ->get();
             return DataTables::of($data)
                 ->addIndexColumn()
                 ->addColumn('status_badge', function ($row) {
@@ -229,7 +233,7 @@ class StudentController extends Controller
                     if ($row->status == 'PENDING') {
                         $actionBtn = '
                         <a class="docs btn btn-primary btn-sm" data-student-id="' . $row->id . '">View Documents</a>
-                        <a class="approve btn btn-success btn-sm" data-student-id="' . $row->id . '" data-student-name="' . $name . '">Approve</a>
+                        <a class="approve btn btn-success btn-sm" data-student-id="' . $row->id . '" data-student-name="' . $name . '" data-student-course="' . $row->course . '" data-student-course-fee="' . $row->course_fee . '">Approve</a>
                         <a class="decline btn btn-danger btn-sm" data-student-id="' . $row->id . '" data-student-name="' . $name . '">Decline</a>';
                     } else {
                         $actionBtn = '

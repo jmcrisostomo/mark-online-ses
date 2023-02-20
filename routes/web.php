@@ -95,9 +95,7 @@ Route::get('/info', function () {
 })->name('student-info')->middleware(Session::class);
 
 // Registrar Routes
-Route::get('/students', function () {
-    return view('user.registrar.student-table');
-})->name('student-table')->middleware(Session::class);
+Route::get('/students', [UserController::class, 'studentTable'])->name('student-table')->middleware(Session::class);
 
 Route::post('/students/submit/approve', [StudentController::class, 'approveStudent'])->name('approve-student')->middleware(Session::class);
 Route::post('/students/submit/decline', [StudentController::class, 'declineStudent'])->name('decline-student')->middleware(Session::class);

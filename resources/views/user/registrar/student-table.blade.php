@@ -58,8 +58,33 @@
                     <div class="modal-body">
                         @csrf
 
+
+                        {{-- {{ $test }} --}}
+                        <div class="mb-3">
+                            <small class="w-100 p-0 fw-bold">Student Info</small>
                         <input type="hidden" id="approveStudentId" name="student_id">
-                        <p class="mb-3">Name: <span class="student-name fw-bold"></span></p>
+                        <p class="mb-1">Name: <span class="student-name fw-bold"></span></p>
+                        <p class="mb-1">Course: <span class="student-course fw-bold"></span></p>
+                        <p class="mb-1">Course Fee: <span class="student-course-fee fw-bold"></span></p>
+                        </div>
+
+                        <div class="d-flex flex-wrap">
+                            <small class="w-100 p-0 fw-bold">Apply Misc Fees</small>
+                            @foreach ($fee as $item)
+                                <div class="form-check w-100">
+                                    <input class="form-check-input cbfees" type="checkbox" value="{{ $item->id }}"
+                                        id="flexCheck{{ $item->id }}" data-amount="{{ $item->amount }}" name="misc_fee[]">
+                                    <label class="form-check-label" for="flexCheck{{ $item->id }}">
+                                        {{ $item->fee_name }} <small class="fw-bold">({{ $item->amount }})</small>
+                                    </label>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div class="calculate-fees">
+                            <small class="w-100 p-0 fw-bold">Subtotal</small>
+                            <h5 class="subtotal">{data_subtotal}</h5>
+                        </div>
 
                     </div>
                     <div class="modal-footer">
@@ -112,6 +137,8 @@
     <script type="text/javascript">
         function getRequirements(studentId) {
 
+
+
             let req = fetch('{{ url('/data/student/requirement') }}' + '/' + studentId, {
                     method: 'GET'
                 })
@@ -146,6 +173,9 @@
         }
 
         $(function() {
+
+            let courseFee = 0.00;
+            let subTotal = 0.00;
 
             var table = $('.student-datatable').DataTable({
                 processing: true,
@@ -198,14 +228,21 @@
 
             });
 
+
             $('.student-datatable').on('click', '.approve', function() {
 
                 let dataStudentId = $(this).attr('data-student-id');
                 let dataStudentName = $(this).attr('data-student-name');
-
+                let dataStudentCourse = $(this).attr('data-student-course');
+                let dataStudentCourseFee = $(this).attr('data-student-course-fee');
                 setTimeout(() => {
-                    document.querySelector('#approveModal .student-name').innerHTML =
-                        dataStudentName
+                    courseFee = parseFloat(dataStudentCourseFee)
+                    subTotal = parseFloat(courseFee) + parseFloat(subTotal)
+                    document.querySelector('.calculate-fees .subtotal').innerHTML = `PHP ${Number.parseFloat(subTotal).toFixed(2)}`
+
+                    document.querySelector('#approveModal .student-name').innerHTML = dataStudentName
+                    document.querySelector('#approveModal .student-course').innerHTML = dataStudentCourse
+                    document.querySelector('#approveModal .student-course-fee').innerHTML = dataStudentCourseFee
 
                     document.querySelector('#approveModal #approveStudentId').value =
                         dataStudentId
@@ -229,6 +266,20 @@
                     declineModal.show()
                 }, 100);
 
+            });
+
+
+
+
+            $('.cbfees').on('click', function() {
+
+                if ($(this).is(':checked')) {
+                    subTotal = subTotal + parseFloat($(this).attr('data-amount'));
+                } else {
+                    subTotal = subTotal - parseFloat($(this).attr('data-amount'));
+                }
+
+                document.querySelector('.calculate-fees .subtotal').innerHTML = `PHP ${Number.parseFloat(subTotal).toFixed(2)}`
             });
 
         });

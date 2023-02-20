@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Fee;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -14,5 +15,11 @@ class UserController extends Controller
         } else {
             return redirect('/login');
         }
+    }
+
+    public function studentTable ()
+    {
+        $getFee = Fee::get();
+        return view('user.registrar.student-table', ['fee' => $getFee]);
     }
 }
