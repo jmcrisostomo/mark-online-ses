@@ -13,3 +13,5 @@ yarn-error.log
 notes.txt
 
 /public/files/students/*
+
+.vercel
