@@ -3,6 +3,7 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\Session;
 use App\Mail\UserVerificationMail;
@@ -46,59 +47,72 @@ Route::get('/registration/success', [HomeController::class, 'submitSuccess']);
 Route::get('/registration/verify/{student_code}', [HomeController::class, 'registrationVerify']);
 Route::post('/registration/verify/submit', [StudentController::class, 'submitVerify'])->name('submit_verify');
 
-// Students
-Route::get('/data/student', [StudentController::class, 'getStudents'])->name('students.list');
-Route::get('/data/student/requirement/{student_id}', function ($studentId) {
-    $getRequirements = DB::table('requirement')
-        ->select('*')
-        ->join('requirement_type', 'requirement_type.id', '=', 'requirement.requirement_type_id')
-        ->join('student', 'student.id', '=', 'requirement.student_id')
-        ->where('student_id', $studentId)
-        ->get();
+Route::group(['middleware' => [Session::class]], function () {
 
-    $getRequirements = collect($getRequirements)->map(function ($arr) {
-        return $arr = [
-            'requirement_type' => $arr->requirement_type,
-            'file' => asset($arr->requirement_path . $arr->requirement_filename . '?t=' . time()),
-            'created_at' => $arr->created_at,
-            'updated_at' => $arr->updated_at,
-            'modified_by' => $arr->modified_by,
-        ];
+    // Default Route
+    Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
+
+    // Registrar Routes
+    Route::get('/students', [UserController::class, 'studentTable'])->name('student-table');
+    Route::get('/students/approved', [UserController::class, 'studentTable'])->name('student-table-approved');
+    Route::get('/students/declined', [UserController::class, 'studentTable'])->name('student-table-declined');
+    Route::get('/data/student', [StudentController::class, 'getStudents'])->name('students.list');
+    Route::get('/data/student/approved', [StudentController::class, 'getApprovedStudents'])->name('students.list.approved');
+    Route::get('/data/student/declined', [StudentController::class, 'getDeclinedStudents'])->name('students.list.declined');
+
+    Route::get('/data/student/requirement/{student_id}', function ($studentId) {
+        $getRequirements = DB::table('requirement')
+            ->select('*')
+            ->join('requirement_type', 'requirement_type.id', '=', 'requirement.requirement_type_id')
+            ->join('student', 'student.id', '=', 'requirement.student_id')
+            ->where('student_id', $studentId)
+            ->get();
+
+        $getRequirements = collect($getRequirements)->map(function ($arr) {
+            return $arr = [
+                'requirement_type' => $arr->requirement_type,
+                'file' => asset($arr->requirement_path . $arr->requirement_filename . '?t=' . time()),
+                'created_at' => $arr->created_at,
+                'updated_at' => $arr->updated_at,
+                'modified_by' => $arr->modified_by,
+            ];
+        });
+
+        return response()->json($getRequirements);
     });
+    Route::post('/students/submit/approve', [StudentController::class, 'approveStudent'])->name('approve-student');
+    Route::post('/students/submit/decline', [StudentController::class, 'declineStudent'])->name('decline-student');
+
+    // Student Routes
+    Route::get('/info', function () {
+
+        $id = session('student_id');
+
+        // $userInfo = DB::table('student')
+        //     ->where('id', $id)
+        //     ->get();
+
+        $userInfo = Student::find($id);
+
+        $name = implode(' ', [
+            $userInfo->first_name,
+            $userInfo->middle_name,
+            $userInfo->last_name,
+        ]);
+
+        $dataTable = route('student-info-transaction');
+
+        return view('user.student.info', ['studentInfo' => $userInfo, 'name' => $name, 'dataTable' => $dataTable]);
+    })->name('student-info');
+
+    Route::get('/info/transaction', [TransactionController::class, 'getUnpaidTransaction'])->name('student-info-transaction');
+});
 
 
-    return response()->json($getRequirements);
-})->middleware(Session::class);
 
 
-// Student
-Route::get('/dashboard', [UserController::class, 'dashboard'])
-    ->middleware(Session::class);
 
-Route::get('/info', function () {
 
-    $id = session('student_id');
-
-    // $userInfo = DB::table('student')
-    //     ->where('id', $id)
-    //     ->get();
-
-    $userInfo = Student::find($id);
-
-    $name = implode(' ', [
-        $userInfo->first_name,
-        $userInfo->middle_name,
-        $userInfo->last_name,
-    ]);
-
-    return view('user.student.info', ['studentInfo' => $userInfo, 'name' => $name]);
-})->name('student-info')->middleware(Session::class);
-
-// Registrar Routes
-Route::get('/students', [UserController::class, 'studentTable'])->name('student-table')->middleware(Session::class);
-
-Route::post('/students/submit/approve', [StudentController::class, 'approveStudent'])->name('approve-student')->middleware(Session::class);
-Route::post('/students/submit/decline', [StudentController::class, 'declineStudent'])->name('decline-student')->middleware(Session::class);
 
 
 

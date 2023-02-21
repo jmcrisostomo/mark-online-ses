@@ -4,17 +4,30 @@
             <div class="nav">
                 <div class="sb-sidenav-menu-heading">Menu</div>
 
+                <a class="nav-link" href="{{ route('dashboard') }}">
+                    <div class="sb-nav-link-icon"><i class="fas fa-home fa-fw"></i></div>
+                    Dashboard
+                </a>
+
                 @if (session('user_type') == 'REGISTRAR')
                     <a class="nav-link" href="{{ route('student-table') }}">
-                        <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
-                        Students
+                        <div class="sb-nav-link-icon"><i class="fas fa-users fa-fw"></i></div>
+                        Pre Enrolled Students
+                    </a>
+                    <a class="nav-link" href="{{ route('student-table-approved') }}">
+                        <div class="sb-nav-link-icon"><i class="fas fa-check fa-fw"></i></div>
+                        Approved Students
+                    </a>
+                    <a class="nav-link" href="{{ route('student-table-declined') }}">
+                        <div class="sb-nav-link-icon"><i class="fas fa-times fa-fw"></i></div>
+                        Declined Students
                     </a>
                 @else
                 @endif
 
                 @if (session('user_type') == 'STUDENT')
-                    <a class="nav-link" href="{{ route('student-table') }}">
-                        <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
+                    <a class="nav-link" href="{{ route('student-info') }}">
+                        <div class="sb-nav-link-icon"><i class="fas fa-user fa-fw"></i></div>
                         Student Info
                     </a>
                 @else

@@ -2,7 +2,7 @@
 
 @section('studentTable')
     <div class="container mt-5">
-        <h2 class="mb-4">Students</h2>
+        <h2 class="mb-4">{{ $header }}</h2>
 
         @if (session('message'))
             <div class="alert alert-primary" role="alert">
@@ -62,10 +62,10 @@
                         {{-- {{ $test }} --}}
                         <div class="mb-3">
                             <small class="w-100 p-0 fw-bold">Student Info</small>
-                        <input type="hidden" id="approveStudentId" name="student_id">
-                        <p class="mb-1">Name: <span class="student-name fw-bold"></span></p>
-                        <p class="mb-1">Course: <span class="student-course fw-bold"></span></p>
-                        <p class="mb-1">Course Fee: <span class="student-course-fee fw-bold"></span></p>
+                            <input type="hidden" id="approveStudentId" name="student_id">
+                            <p class="mb-1">Name: <span class="student-name fw-bold"></span></p>
+                            <p class="mb-1">Course: <span class="student-course fw-bold"></span></p>
+                            <p class="mb-1">Course Fee: <span class="student-course-fee fw-bold"></span></p>
                         </div>
 
                         <div class="d-flex flex-wrap">
@@ -73,7 +73,8 @@
                             @foreach ($fee as $item)
                                 <div class="form-check w-100">
                                     <input class="form-check-input cbfees" type="checkbox" value="{{ $item->id }}"
-                                        id="flexCheck{{ $item->id }}" data-amount="{{ $item->amount }}" name="misc_fee[]">
+                                        id="flexCheck{{ $item->id }}" data-amount="{{ $item->amount }}"
+                                        name="fee_ids[]">
                                     <label class="form-check-label" for="flexCheck{{ $item->id }}">
                                         {{ $item->fee_name }} <small class="fw-bold">({{ $item->amount }})</small>
                                     </label>
@@ -116,7 +117,8 @@
 
                             <div class="mb-3 col-md-12">
                                 <div class="input-control">
-                                    <textarea id="inputLname" name="decline_reason" class="input-field" placeholder="Reason" style="resize: none;" required></textarea>
+                                    <textarea id="inputLname" name="decline_reason" class="input-field" placeholder="Reason" style="resize: none;"
+                                        required></textarea>
                                     <label for="inputLname" class="input-label">Reason for Decline</label>
                                 </div>
                             </div>
@@ -180,7 +182,8 @@
             var table = $('.student-datatable').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('students.list') }}",
+
+                ajax: "{{ $dataTable }}",
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex'
@@ -238,11 +241,15 @@
                 setTimeout(() => {
                     courseFee = parseFloat(dataStudentCourseFee)
                     subTotal = parseFloat(courseFee) + parseFloat(subTotal)
-                    document.querySelector('.calculate-fees .subtotal').innerHTML = `PHP ${Number.parseFloat(subTotal).toFixed(2)}`
+                    document.querySelector('.calculate-fees .subtotal').innerHTML =
+                        `PHP ${Number.parseFloat(subTotal).toFixed(2)}`
 
-                    document.querySelector('#approveModal .student-name').innerHTML = dataStudentName
-                    document.querySelector('#approveModal .student-course').innerHTML = dataStudentCourse
-                    document.querySelector('#approveModal .student-course-fee').innerHTML = dataStudentCourseFee
+                    document.querySelector('#approveModal .student-name').innerHTML =
+                        dataStudentName
+                    document.querySelector('#approveModal .student-course').innerHTML =
+                        dataStudentCourse
+                    document.querySelector('#approveModal .student-course-fee').innerHTML =
+                        dataStudentCourseFee
 
                     document.querySelector('#approveModal #approveStudentId').value =
                         dataStudentId
@@ -279,7 +286,8 @@
                     subTotal = subTotal - parseFloat($(this).attr('data-amount'));
                 }
 
-                document.querySelector('.calculate-fees .subtotal').innerHTML = `PHP ${Number.parseFloat(subTotal).toFixed(2)}`
+                document.querySelector('.calculate-fees .subtotal').innerHTML =
+                    `PHP ${Number.parseFloat(subTotal).toFixed(2)}`
             });
 
         });

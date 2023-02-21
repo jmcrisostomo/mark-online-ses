@@ -32,17 +32,17 @@
 
         <div id="layoutSidenav_content">
 
-            @if (session('user_type') == 'REGISTRAR')
-                <main>
-                    @yield('studentTable')
-                </main>
-            @endif
+            <main>
+                <div class="container">
+                    @if (session('user_type') == 'REGISTRAR')
+                        @yield('studentTable')
+                    @endif
 
-            @if (session('user_type') == 'STUDENT')
-                <main>
-                    @yield('studentInfo')
-                </main>
-            @endif
+                    @if (session('user_type') == 'STUDENT')
+                        @yield('studentInfo')
+                    @endif
+                </div>
+            </main>
 
             <footer class="py-4 bg-light mt-auto">
                 <div class="container-fluid px-4">
@@ -75,6 +75,8 @@
 
     @if (session('user_type') == 'REGISTRAR')
         @yield('studentTableScript')
+    @elseif (session('user_type') == 'STUDENT')
+        @yield('studentInfoScript')
     @endif
 </body>
 

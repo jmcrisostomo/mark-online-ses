@@ -5,10 +5,15 @@ namespace App\Http\Controllers;
 use App\Mail\StudentApproveMail;
 use App\Mail\StudentDeclineMail;
 use App\Mail\UserVerificationMail;
+use App\Models\Course;
+use App\Models\Fee;
 use App\Models\Student;
 use App\Models\Requirement;
 use App\Models\RequirementType;
+use App\Models\Transaction;
+use App\Models\TransactionDetail;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -208,6 +213,101 @@ class StudentController extends Controller
             $data = DB::table('student')
                 ->select('student.*', 'course.course', 'course.course_fee')
                 ->join('course', 'course.id', '=', 'student.course_id')
+                ->where('status', 'PENDING')
+                ->orderBy('student.id', 'desc')
+                ->get();
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('status_badge', function ($row) {
+
+                    if ($row->status == 'PENDING') {
+                        $badge = '<span class="badge bg-warning text-dark">' . $row->status . '</span>';
+                    } else if ($row->status == 'APPROVED') {
+                        $badge = '<span class="badge bg-success">' . $row->status . '</span>';
+                    } else if ($row->status == 'DECLINED') {
+                        $badge = '<span class="badge bg-danger">' . $row->status . '</span>';
+                    } else {
+                        $badge = '<span class="badge bg-light">' . $row->status . '</span>';
+                    }
+
+                    return $badge;
+                })
+                ->addColumn('action', function ($row) {
+
+                    $name = implode(" ", [$row->first_name, $row->last_name]);
+
+                    if ($row->status == 'PENDING') {
+                        $actionBtn = '
+                        <a class="docs btn btn-primary btn-sm" data-student-id="' . $row->id . '">View Documents</a>
+                        <a class="approve btn btn-success btn-sm" data-student-id="' . $row->id . '" data-student-name="' . $name . '" data-student-course="' . $row->course . '" data-student-course-fee="' . $row->course_fee . '">Approve</a>
+                        <a class="decline btn btn-danger btn-sm" data-student-id="' . $row->id . '" data-student-name="' . $name . '">Decline</a>';
+                    } else {
+                        $actionBtn = '
+                        <a class="docs btn btn-primary btn-sm" data-student-id="' . $row->id . '">View Documents</a>';
+                    }
+
+
+                    return $actionBtn;
+                })
+                ->rawColumns(['action', 'status_badge'])
+                ->make(true);
+        }
+    }
+
+    public function getApprovedStudents(Request $request)
+    {
+        if ($request->ajax()) {
+            $data = DB::table('student')
+                ->select('student.*', 'course.course', 'course.course_fee')
+                ->join('course', 'course.id', '=', 'student.course_id')
+                ->where('status', 'APPROVED')
+                ->orderBy('student.id', 'desc')
+                ->get();
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('status_badge', function ($row) {
+
+                    if ($row->status == 'PENDING') {
+                        $badge = '<span class="badge bg-warning text-dark">' . $row->status . '</span>';
+                    } else if ($row->status == 'APPROVED') {
+                        $badge = '<span class="badge bg-success">' . $row->status . '</span>';
+                    } else if ($row->status == 'DECLINED') {
+                        $badge = '<span class="badge bg-danger">' . $row->status . '</span>';
+                    } else {
+                        $badge = '<span class="badge bg-light">' . $row->status . '</span>';
+                    }
+
+                    return $badge;
+                })
+                ->addColumn('action', function ($row) {
+
+                    $name = implode(" ", [$row->first_name, $row->last_name]);
+
+                    if ($row->status == 'PENDING') {
+                        $actionBtn = '
+                        <a class="docs btn btn-primary btn-sm" data-student-id="' . $row->id . '">View Documents</a>
+                        <a class="approve btn btn-success btn-sm" data-student-id="' . $row->id . '" data-student-name="' . $name . '" data-student-course="' . $row->course . '" data-student-course-fee="' . $row->course_fee . '">Approve</a>
+                        <a class="decline btn btn-danger btn-sm" data-student-id="' . $row->id . '" data-student-name="' . $name . '">Decline</a>';
+                    } else {
+                        $actionBtn = '
+                        <a class="docs btn btn-primary btn-sm" data-student-id="' . $row->id . '">View Documents</a>';
+                    }
+
+
+                    return $actionBtn;
+                })
+                ->rawColumns(['action', 'status_badge'])
+                ->make(true);
+        }
+    }
+
+    public function getDeclinedStudents(Request $request)
+    {
+        if ($request->ajax()) {
+            $data = DB::table('student')
+                ->select('student.*', 'course.course', 'course.course_fee')
+                ->join('course', 'course.id', '=', 'student.course_id')
+                ->where('status', 'DECLINED')
                 ->orderBy('student.id', 'desc')
                 ->get();
             return DataTables::of($data)
@@ -251,10 +351,15 @@ class StudentController extends Controller
 
     public function approveStudent(Request $request)
     {
+
+        $feeIds = $request->input('fee_ids');
         $studentId = $request->input('student_id');
         $studentId = Student::find($studentId);
 
+
         if ($studentId) {
+            $this->generateTransaction($studentId, $feeIds);
+
             DB::table('student')
                 ->where('id', $studentId->id)
                 ->update(['status' => 'APPROVED', 'student_requirement_status' => 'COMPLETED']);
@@ -272,6 +377,60 @@ class StudentController extends Controller
             return redirect('/students')->with('message', 'Student Approved.');
         } else {
             return redirect('/students')->with('message', 'Cannot find Student.');
+        }
+    }
+
+    public function generateTransaction($studentId, $feeIds)
+    {
+        // TODO: Calculate the fee then generate the first transaction before the transaction details
+
+        $totalAmount = 0;
+        $transactionDetailArr = [];
+
+        $getCourseFee = Course::find($studentId->course_id);
+        if ($getCourseFee) {
+            $totalAmount = $totalAmount + (float) $getCourseFee->course_fee;
+            $transactionDetailArr[] = [
+                'transaction_type' => 'COURSE',
+                'transaction_name' => $getCourseFee->course,
+                'amount' => $getCourseFee->course_fee
+            ];
+        }
+
+        if ($feeIds != NULL || !empty($feeIds)) {
+            foreach ($feeIds as $id) {
+                $getMiscFees = Fee::find($id);
+                if ($getMiscFees) {
+                    $totalAmount = $totalAmount + (float) $getMiscFees->amount;
+                    $transactionDetailArr[] = [
+                        'transaction_type' => 'MISC',
+                        'transaction_name' => $getMiscFees->fee_name,
+                        'amount' => $getMiscFees->amount
+                    ];
+                }
+            }
+        }
+
+        $transactionCreate = Transaction::create([
+            'student_id'        => $studentId->id,
+            'transaction_status'  => 'UNPAID',
+            'transaction_date'  => Carbon::now()->toDateTimeString(),
+            'payment_mode_id'   => '100', // Unspecified Id
+            'control_number'    => NULL,
+            'admin_name'        => NULL,
+            'admin_signed'      => FALSE,
+            'amount'            => number_format($totalAmount, 2, '.', ''),
+            'total_fee'         => number_format($totalAmount, 2, '.', ''),
+            'total_balance'     => number_format($totalAmount, 2, '.', ''),
+        ]);
+
+        $transactionNumber = Transaction::find($transactionCreate->id);
+        $transactionNumber->transaction_number = "TRN" . str_pad($transactionCreate->id, 8, "0", STR_PAD_LEFT);
+        $transactionNumber->save();
+
+        foreach ($transactionDetailArr as $arr) {
+            $temp = array_merge(['transaction_id' => $transactionCreate->id], $arr);
+            TransactionDetail::create($temp);
         }
     }
 

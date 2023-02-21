@@ -32,7 +32,9 @@
                                     @if ($studentInfo->status == 'PENDING')
                                         <span class="badge bg-warning text-dark">{{ $studentInfo->status }}</span>
                                     @elseif ($studentInfo->status == 'APPROVED')
-                                        <span class="badge bg-success">{{ $studentInfo->status }}</span>
+                                        <span class="badge bg-primary">{{ $studentInfo->status }}</span>
+                                    @elseif ($studentInfo->status == 'PROCESSING')
+                                        <span class="badge bg-primary">{{ $studentInfo->status }}</span>
                                     @elseif ($studentInfo->status == 'DECLINED')
                                         <span class="badge bg-danger">{{ $studentInfo->status }}</span>
                                     @else
@@ -55,7 +57,7 @@
                                 </div> --}}
                             </div>
                         </div>
-                        <div class="card mb-4 mb-lg-0">
+                        <div class="card mb-4 mb-lg-0 d-none">
                             <div class="card-body p-0">
                                 <ul class="list-group list-group-flush rounded-3">
                                     <li class="list-group-item d-flex justify-content-between align-items-center p-3">
@@ -131,7 +133,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row d-none">
                             <div class="col-md-6">
                                 <div class="card mb-4 mb-md-0">
                                     <div class="card-body">
@@ -202,10 +204,72 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="col-lg-12">
+                        <div class="container mt-5">
+                            <h2 class="mb-4">Payments</h2>
+
+                            <table class="table table-bordered student-datatable bg-light">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Status</th>
+                                        <th>Trn #</th>
+                                        <th>Description</th>
+                                        <th>Amount</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
     </div>
+@endsection
+
+@section('studentInfoScript')
+    <script type="text/javascript">
+        $(function() {
+            var table = $('.student-datatable').DataTable({
+                processing: true,
+                serverSide: true,
+
+                ajax: "{{ $dataTable }}",
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex'
+                    },
+                    {
+                        data: 'status_badge',
+                        name: 'status'
+                    },
+                    {
+                        data: 'transaction_number',
+                        name: 'transaction_number'
+                    },
+                    {
+                        data: 'description',
+                        name: 'description'
+                    },
+                    {
+                        data: 'amount_dec',
+                        name: 'amount'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: true,
+                        searchable: true
+                    },
+                ]
+            });
+
+        });
+    </script>
 @endsection
 
 {{-- id: 20,

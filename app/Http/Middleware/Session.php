@@ -15,13 +15,10 @@ class Session
      */
     public function handle($request, Closure $next)
     {
-
         if (session()->has('login_time')) {
-
+            return $next($request);
         } else {
-            redirect()->route('login')->with('not_logged_in', 'You are not logged in.');
+            return redirect()->route('login')->with('not_logged_in', 'You are not logged in.');
         }
-
-        return $next($request);
     }
 }
