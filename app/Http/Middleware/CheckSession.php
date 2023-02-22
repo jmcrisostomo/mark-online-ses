@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 
-class Session
+class CheckSession
 {
     /**
      * Handle an incoming request.
@@ -15,10 +15,12 @@ class Session
      */
     public function handle($request, Closure $next)
     {
-        if (session()->has('login_time')) {
-            return $next($request);
-        } else {
-            return redirect()->route('login')->with('not_logged_in', 'You are not logged in.');
+
+        if (!$request->session()->exists('login_time')) {
+            // user value cannot be found in session
+            return redirect('/login');
         }
+
+        return $next($request);
     }
 }

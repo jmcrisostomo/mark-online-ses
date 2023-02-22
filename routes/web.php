@@ -47,7 +47,11 @@ Route::get('/registration/success', [HomeController::class, 'submitSuccess']);
 Route::get('/registration/verify/{student_code}', [HomeController::class, 'registrationVerify']);
 Route::post('/registration/verify/submit', [StudentController::class, 'submitVerify'])->name('submit_verify');
 
-Route::group(['middleware' => ['session']], function () {
+Route::group(['middleware' => 'checksession'], function () {
+
+    // if (session()->has('login_time') == null) {
+    //     return redirect()->route('login')->with('not_logged_in', 'You are not logged in.');
+    // }
 
     // Default Route
     Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
