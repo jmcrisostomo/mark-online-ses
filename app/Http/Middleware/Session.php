@@ -15,7 +15,7 @@ class Session
      */
     public function handle($request, Closure $next)
     {
-        if (session()->has('login_time')) {
+        if (session()->has('login_time') == true) {
             return $next($request);
         } else {
             return redirect()->route('login')->with('not_logged_in', 'You are not logged in.');
