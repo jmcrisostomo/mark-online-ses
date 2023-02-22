@@ -47,7 +47,7 @@ Route::get('/registration/success', [HomeController::class, 'submitSuccess']);
 Route::get('/registration/verify/{student_code}', [HomeController::class, 'registrationVerify']);
 Route::post('/registration/verify/submit', [StudentController::class, 'submitVerify'])->name('submit_verify');
 
-Route::group(['middleware' => ['web']], function () {
+Route::group(['middleware' => ['session']], function () {
 
     // Default Route
     Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
