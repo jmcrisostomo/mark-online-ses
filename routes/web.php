@@ -84,27 +84,7 @@ Route::group(['middleware' => [Session::class]], function () {
     Route::post('/students/submit/decline', [StudentController::class, 'declineStudent'])->name('decline-student');
 
     // Student Routes
-    Route::get('/info', function () {
-
-        $id = session('student_id');
-
-        // $userInfo = DB::table('student')
-        //     ->where('id', $id)
-        //     ->get();
-
-        $userInfo = Student::find($id);
-
-        $name = implode(' ', [
-            $userInfo->first_name,
-            $userInfo->middle_name,
-            $userInfo->last_name,
-        ]);
-
-        $dataTable = route('student-info-transaction');
-
-        return view('user.student.info', ['studentInfo' => $userInfo, 'name' => $name, 'dataTable' => $dataTable]);
-    })->name('student-info');
-
+    Route::get('/info', [UserController::class, 'studentInfo'])->name('student-info');
     Route::get('/info/transaction', [TransactionController::class, 'getUnpaidTransaction'])->name('student-info-transaction');
 });
 

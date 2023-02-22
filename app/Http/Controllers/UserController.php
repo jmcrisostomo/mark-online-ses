@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Fee;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -34,8 +35,24 @@ class UserController extends Controller
         }
         return view('user.registrar.student-table', ['fee' => $getFee, 'header' => $header, 'dataTable' => $dataTable]);
     }
-    public function test(Request $request)
+    // public function test(Request $request)
+    // {
+    //     return $request;
+    // }
+    public function studentInfo()
     {
-        return $request;
+        $id = session('student_id');
+
+        $userInfo = Student::find($id);
+
+        $name = implode(' ', [
+            $userInfo->first_name,
+            $userInfo->middle_name,
+            $userInfo->last_name,
+        ]);
+
+        $dataTable = route('student-info-transaction');
+
+        return view('user.student.info', ['studentInfo' => $userInfo, 'name' => $name, 'dataTable' => $dataTable]);
     }
 }
