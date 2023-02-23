@@ -9,6 +9,8 @@
                     Dashboard
                 </a>
 
+
+
                 @if (session('user_type') == 'REGISTRAR')
                     <a class="nav-link" href="{{ route('student-table') }}">
                         <div class="sb-nav-link-icon"><i class="fas fa-users fa-fw"></i></div>
@@ -23,6 +25,13 @@
                         Declined Students
                     </a>
                 @else
+                @endif
+
+                @if (session('user_type') == 'CASHIER')
+                    <a class="nav-link" href="{{ route('student-payment') }}">
+                        <div class="sb-nav-link-icon"><i class="fas fa-bank fa-fw"></i></div>
+                        Payments
+                    </a>
                 @endif
 
                 @if (session('user_type') == 'STUDENT')

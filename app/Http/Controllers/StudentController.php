@@ -420,7 +420,7 @@ class StudentController extends Controller
             'admin_name'        => NULL,
             'admin_signed'      => FALSE,
             'amount'            => number_format($totalAmount, 2, '.', ''),
-            'total_fee'         => number_format($totalAmount, 2, '.', ''),
+            '   total_fee'         => number_format($totalAmount, 2, '.', ''),
             'total_balance'     => number_format($totalAmount, 2, '.', ''),
         ]);
 

@@ -34,6 +34,10 @@
 
             <main>
                 <div class="container">
+                    @if (session('user_type') == 'CASHIER')
+                        @yield('studentPayment')
+                    @endif
+
                     @if (session('user_type') == 'REGISTRAR')
                         @yield('studentTable')
                     @endif
@@ -75,6 +79,8 @@
 
     @if (session('user_type') == 'REGISTRAR')
         @yield('studentTableScript')
+    @elseif (session('user_type') == 'CASHIER')
+        @yield('studentPaymentScript')
     @elseif (session('user_type') == 'STUDENT')
         @yield('studentInfoScript')
     @endif

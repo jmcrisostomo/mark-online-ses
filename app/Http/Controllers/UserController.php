@@ -35,10 +35,7 @@ class UserController extends Controller
         }
         return view('user.registrar.student-table', ['fee' => $getFee, 'header' => $header, 'dataTable' => $dataTable]);
     }
-    // public function test(Request $request)
-    // {
-    //     return $request;
-    // }
+
     public function studentInfo()
     {
         $id = session('student_id');

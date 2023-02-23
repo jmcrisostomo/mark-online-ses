@@ -37,6 +37,8 @@
                                         <span class="badge bg-primary">{{ $studentInfo->status }}</span>
                                     @elseif ($studentInfo->status == 'DECLINED')
                                         <span class="badge bg-danger">{{ $studentInfo->status }}</span>
+                                    @elseif ($studentInfo->status == 'ENROLLED')
+                                        <span class="badge bg-success">{{ $studentInfo->status }}</span>
                                     @else
                                         <span class="badge bg-light">{{ $studentInfo->status }}</span>
                                     @endif
@@ -209,6 +211,12 @@
                         <div class="container mt-5">
                             <h2 class="mb-4">Payments</h2>
 
+                            @if (session('message'))
+                                <div class="alert alert-primary" role="alert">
+                                    {{ session('message') }}
+                                </div>
+                            @endif
+
                             <table class="table table-bordered student-datatable bg-light">
                                 <thead>
                                     <tr>
@@ -225,6 +233,106 @@
                             </table>
                         </div>
                     </div>
+
+                    <!-- documentModal -->
+                    <div class="modal fade" id="documentModal" tabindex="-1" aria-labelledby="documentModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="documentModalLabel">View</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    {{-- Generate Data Here --}}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- paymentModal -->
+                    <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel"
+                        aria-hidden="true">
+                        <form class="form row" method="POST" action="{{ route('submit-receipt') }}"
+                            enctype="multipart/form-data">
+                            <div class="modal-dialog modal-xl">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="paymentModalLabel">Pay</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <p>Send your payment to these online payment modes:</p>
+                                                <table class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Gcash</th>
+                                                            <th>BDO</th>
+                                                            <th>BPI</th>
+                                                            <th>UB</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="d-flex flex-column">
+                                                                    <span class="fw-bold">ONLINE-SES</span>
+                                                                    <span>09986762273</span>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="d-flex flex-column">
+                                                                    <span class="fw-bold">ONLINE-SES-BDO</span>
+                                                                    <span>788579284884</span>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="d-flex flex-column">
+                                                                    <span class="fw-bold">ONLINE-SES-BPI</span>
+                                                                    <span>3336032132</span>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="d-flex flex-column">
+                                                                    <span class="fw-bold">ONLINE-SES-UB</span>
+                                                                    <span>255746739</span>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-12 mb-5">
+                                                <p>After sending your payment, upload your receipt here:</p>
+                                                <div class="input-control">
+                                                    @csrf
+
+                                                    <input class="input-field" type="file" id="formReceipt"
+                                                        name="receipt" accept="image/png, image/gif, image/jpeg" required>
+                                                    <label for="formReceipt" class="input-label">Receipt</label>
+                                                    <input type="hidden" id="transactionId" name="transaction_id">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-primary">Pay</button>
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
                 </div>
             </div>
         </section>
@@ -233,7 +341,55 @@
 
 @section('studentInfoScript')
     <script type="text/javascript">
+        function getRequirements(studentId) {
+
+            let req = fetch('{{ url('/data/student/payment') }}' + '/' + studentId, {
+                    method: 'GET'
+                })
+                .then(res => res.json())
+                .then(data => {
+
+                    const wrapper = document.createElement("div");
+                    wrapper.classList.add('text-center', 'd-flex', 'flex-wrap', 'align-items-center',
+                        'justify-align--center');
+
+                    data.forEach(item => {
+                        const span = document.createElement("span");
+                        span.innerText = item.requirement_type;
+                        span.classList.add('w-50');
+                        wrapper.append(span)
+
+                        const img = document.createElement("img");
+                        img.src = item.file;
+                        img.classList.add('img-fluid', 'mb-3', 'w-50');
+                        wrapper.append(img)
+
+                        console.log(item)
+                    })
+                    // console.log(wrapper)
+
+                    document.querySelector('#documentModal .modal-body').innerHTML = null;
+                    document.querySelector('#documentModal .modal-body').append(wrapper)
+
+                })
+                .catch(err => console.error(err))
+
+        }
+
         $(function() {
+
+            let documentModal = new bootstrap.Modal(document.getElementById('documentModal'), {})
+            let paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'), {})
+            $('.student-datatable').on('click', '.docs', function() {
+                let dataTransactionId = $(this).attr('data-transaction-id');
+                setTimeout(() => {
+                    // console.log(dataStudentId)
+                    getRequirements(dataTransactionId)
+                    documentModal.show()
+                }, 100);
+
+            });
+
             var table = $('.student-datatable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -266,6 +422,16 @@
                         searchable: true
                     },
                 ]
+            });
+
+            $('.student-datatable').on('click', '.pay', function() {
+                let dataTransactionId = $(this).attr('data-transaction-id');
+                setTimeout(() => {
+                    document.querySelector('#paymentModal #transactionId').value =
+                        dataTransactionId
+                    paymentModal.show()
+                }, 100);
+
             });
 
         });

@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\CashierController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
@@ -10,6 +12,9 @@ use App\Mail\UserVerificationMail;
 use App\Models\Requirement;
 use App\Models\RequirementType;
 use App\Models\Student;
+use App\Models\Transaction;
+use App\Models\TransactionDetail;
+use Carbon\Carbon;
 use Facade\FlareClient\Http\Response;
 use Facade\FlareClient\Stacktrace\File;
 use Illuminate\Support\Arr;
@@ -90,6 +95,30 @@ Route::group(['middleware' => 'checksession'], function () {
     // Student Routes
     Route::get('/info', [UserController::class, 'studentInfo'])->name('student-info');
     Route::get('/info/transaction', [TransactionController::class, 'getUnpaidTransaction'])->name('student-info-transaction');
+    Route::post('/submit/payment', [PaymentController::class, 'sendPayment'])->name('submit-receipt');
+    Route::get('/data/student/payment/{transaction_id}', function ($transactionId) {
+        $getReceipt = DB::table('transaction')
+            ->select('*')
+            ->where('id', $transactionId)
+            ->get();
+
+        $getReceipt = collect($getReceipt)->map(function ($arr) {
+            return $arr = [
+                'requirement_type' => 'Uploaded Receipt',
+                'file' => asset($arr->receipt_path . $arr->receipt_filename . '?t=' . time()),
+                'created_at' => $arr->created_at,
+                'updated_at' => $arr->updated_at,
+                'modified_by' => $arr->modified_by,
+            ];
+        });
+
+        return response()->json($getReceipt);
+    });
+
+    //Cashier route
+    Route::get('/payments', [CashierController::class, 'payments'])->name('student-payment');
+    Route::get('/data/payment', [TransactionController::class, 'getTranasctionPayment'])->name('students.payment');
+    Route::post('/submit/payment/approve', [PaymentController::class, 'approvePayment'])->name('submit.payment.approve');
 });
 
 
@@ -114,7 +143,33 @@ Route::group(['middleware' => 'checksession'], function () {
 
 // TESTING PURPOSES
 
-Route::get('/test', [StudentController::class, 'createUserAccount']);
+// Route::get('/test', [StudentController::class, 'createUserAccount']);
+Route::get('/test', function () {
+
+    $transaction = Transaction::find(3);
+    $getTransactionDetail = TransactionDetail::where('transaction_id', $transaction->id)->get();
+    $student = Student::find($transaction->student_id);
+
+    $date = new Carbon($transaction->transaction_date);
+    $date = $date->format('F d, Y h:mA');
+
+    $transactionDetail = collect($getTransactionDetail)->map(function ($arr) {
+        $temp = [
+            'description' => $arr->transaction_type . " - " . $arr->transaction_name,
+            'amount' => number_format($arr->amount, 2, '.')
+        ];
+        return $temp;
+    });
+
+    $mailData = [
+        'name' => implode(" ", [$student->first_name, $student->last_name]),
+        'transaction_number' => $transaction->transaction_number,
+        'transaction_detail' => $transactionDetail,
+        'transaction_date' => $date,
+        'amount' =>  number_format($transaction->amount, 2, '.'),
+    ];
+    return view('email.studentreceipt', ['mailData' => $mailData]);
+});
 Route::get('/testEloquent', function () {
     // $req = DB::table('requirement')
     //     ->select('*')
